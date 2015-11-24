@@ -1,6 +1,7 @@
 ### 程序主要分为三个文件
 ##### 文档获取(get_article)
 - 文档来自于国外的一个博客 [链接](http://flowingdata.com/most-recent/)
+- 中文来自国内的一个博客[链接](http://www.yinwang.org)
 - 不断获取所有的博客内容并存入数据库
 - 数据库各字段名称为 
   - id(查询时的文档id) 
@@ -9,9 +10,9 @@
   
 ##### 建立索引(inverted_index)
 - 首先获取文档、停词表
+- word_split
+ - 使用结巴分词并去除分词结果中的标点  
 - get_word_index
-  - 根据非字符进行分词
-  - 如果文档以非字符结尾则分词结果中会含有一个空字符，判断并去除
   - 取出停词并返回各词极及其索引(word,index)
 - get_word_list
   - 根据单词合并各个索引
@@ -45,6 +46,6 @@
   - 根据查询结果id集合来获取对应的文档标题
 
 ### 测试
-- 选取when you analyze and visualize, remember the context of your data. 中的单词进行测试  
+- 选取“智商的圈套”进行测试  
 - 测试结果见截图  
 
