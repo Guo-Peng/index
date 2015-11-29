@@ -1,17 +1,11 @@
 # -*- coding: UTF-8 -*-
-from get_article import get_conn
-from functools import wraps
 import jieba
+import os
 
 
-def get_inverted(n, symbol, stop_words):
+def get_inverted(symbol, stop_words):
     inverted = {}
-    #  获取文章
-    chinese = True
-    database = 'docs'
-    if chinese:
-        database += '_cn'
-    articles = get_articles(n, database)
+    articles = get_articles()
     for doc_id, path in articles:
         word_index = get_word_index(get_doc(path), symbol, stop_words)
         word_list = get_word_list(word_index)
@@ -43,21 +37,18 @@ def word_split(content, symbol):
             if word not in [u'', u' ', u'\t', u'\n']]
 
 
-def get_articles(n, database):
-    conn = get_conn()
-    cursor = conn.cursor()
-    sql = 'SELECT id,path FROM ' + database + ' WHERE id<=%d' % n
-    try:
-        cursor.execute(sql)
-        conn.commit()
-        result = cursor.fetchall()
-        return [(int(doc_id), path) for doc_id, path in result]
-    except Exception, e:
-        print e
-        conn.rollback()
-    finally:
-        cursor.close()
-        conn.close()
+def get_articles():
+    path = '/Users/Peterkwok/Documents/docs_cn/'
+    doc_names = os.listdir(path)[1:]
+    return [(index, path + name) for index, name in enumerate(doc_names)]
+
+
+def get_header_by_id(id_list):
+    if id_list:
+        doc_names = os.listdir('/Users/Peterkwok/Documents/docs_cn/')[1:]
+        return [doc_names[doc_id] for doc_id in id_list]
+    else:
+        return []
 
 
 def get_doc(path):
@@ -71,23 +62,13 @@ def get_stop_words():
 def get_symbol():
     return [line.strip().decode('utf-8') for line in open('symbol', 'r').readlines()]
 
-
-def decorator_inverted(n):
-    def decorator(func):
-        symbol = get_symbol()
-        stop_words = get_stop_words()
-        inverted = get_inverted(n, symbol, stop_words)
-
-        @wraps(func)
-        def wrapper(query):
-            return func(query, symbol, stop_words, inverted)
-
-        return wrapper
-
-    return decorator
-
-
-if __name__ == '__main__':
-    s = '任天堂3DS游戏机'
-    sy = get_symbol()
-    print '//'.join(word_split(s, sy))
+# def decorator(func):
+#     symbol = get_symbol()
+#     stop_words = get_stop_words()
+#     inverted = get_inverted(symbol, stop_words)
+#
+#     @wraps(func)
+#     def wrapper(query):
+#         return func(query, symbol, stop_words, inverted)
+#
+#     return wrapper
